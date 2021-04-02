@@ -66,90 +66,49 @@ class GenerateCal
   
     end
 
-    def generate_3month_days_string(premonth_day_cells, thismonth_day_cells, postmonth_day_cells)
+    def generate_three_month_days_string(premonth_day_cells, thismonth_day_cells, postmonth_day_cells)
       @premonth_day_cells = premonth_day_cells
       @thismonth_day_cells = thismonth_day_cells
       @postmonth_day_cells = postmonth_day_cells
 
       maxsize = [@premonth_day_cells.size, @thismonth_day_cells.size, @postmonth_day_cells.size].max
 
-      three_month_day_cells = []
-
       if (28 <  maxsize && maxsize < 36) then
-        while @premonth_day_cells.size < 35 do
-          @premonth_day_cells << "   "
-        end
-        while @thismonth_day_cells.size < 35 do
-          @thismonth_day_cells << "   "
-        end
-        while @postmonth_day_cells.size < 35 do
-          @postmonth_day_cells << "   "
-        end
-
-
-        three_month_day_cells << @premonth_day_cells[0..6]
-        three_month_day_cells << @thismonth_day_cells[0..6]
-        three_month_day_cells << @postmonth_day_cells[0..6]
-        three_month_day_cells << @premonth_day_cells[7..13]
-        three_month_day_cells << @thismonth_day_cells[7..13]
-        three_month_day_cells << @postmonth_day_cells[7..13]
-        three_month_day_cells << @premonth_day_cells[14..20]
-        three_month_day_cells << @thismonth_day_cells[14..20]
-        three_month_day_cells << @postmonth_day_cells[14..20]
-        three_month_day_cells << @premonth_day_cells[21..27]
-        three_month_day_cells << @thismonth_day_cells[21..27]
-        three_month_day_cells << @postmonth_day_cells[21..27]
-        three_month_day_cells << @premonth_day_cells[28..34]
-        three_month_day_cells << @thismonth_day_cells[28..34]
-        three_month_day_cells << @postmonth_day_cells[28..34]
-        p "row = 5"
-
+        column = 5
       else
-        while @premonth_day_cells.size < 42 do
-          @premonth_day_cells << "   "
-        end
-        while @thismonth_day_cells.size < 42 do
-          @thismonth_day_cells << "   "
-        end
-        while @postmonth_day_cells.size < 42 do
-          @postmonth_day_cells << "   "
-        end
-
-        three_month_day_cells << @premonth_day_cells[0..6]
-        three_month_day_cells << @thismonth_day_cells[0..6]
-        three_month_day_cells << @postmonth_day_cells[0..6]
-        three_month_day_cells << @premonth_day_cells[7..13]
-        three_month_day_cells << @thismonth_day_cells[7..13]
-        three_month_day_cells << @postmonth_day_cells[7..13]
-        three_month_day_cells << @premonth_day_cells[14..20]
-        three_month_day_cells << @thismonth_day_cells[14..20]
-        three_month_day_cells << @postmonth_day_cells[14..20]
-        three_month_day_cells << @premonth_day_cells[21..27]
-        three_month_day_cells << @thismonth_day_cells[21..27]
-        three_month_day_cells << @postmonth_day_cells[21..27]
-        three_month_day_cells << @premonth_day_cells[28..34]
-        three_month_day_cells << @thismonth_day_cells[28..34]
-        three_month_day_cells << @postmonth_day_cells[28..34]
-        three_month_day_cells << @premonth_day_cells[35..41]
-        three_month_day_cells << @thismonth_day_cells[35..41]
-        three_month_day_cells << @postmonth_day_cells[35..41]
-
-        p "row = 6"
+        column = 6
       end
 
-      three_month_day_cells.flatten!
-
-      days_result = ""
-      three_month_day_cells.map.with_index do |cell, i|
-        if (i % 7 == 6 && i != 0 && i % 7 % 3 == 2)
-          cell = "#{cell}\n"
-        elsif (i % 7 == 6 && i != 0)
-          cell = "#{cell}\s\s"
-        else
-        end
-        days_result << cell
+      while @premonth_day_cells.size < column * 7 do
+        @premonth_day_cells << "   "
       end
-      return days_result
+      while @thismonth_day_cells.size < column * 7 do
+        @thismonth_day_cells << "   "
+      end
+      while @postmonth_day_cells.size < column * 7 do
+        @postmonth_day_cells << "   "
+      end
+
+      three_month_day_cells = Array.new(column).map{Array.new(21,nil)}
+      three_month_day_cells.map.each_with_index do |element, index|
+        @premonth_day_cells[index * 7..index * 7 + 6]
+        element[0..6] = @premonth_day_cells[index * 7..index * 7 + 6]
+        element[7..13] = @thismonth_day_cells[index * 7..index * 7 + 6]
+        element[14..20] = @postmonth_day_cells[index * 7..index * 7 + 6]
+
+        element.insert(14, " ")
+        element.insert(7, " ")
+        end
+
+        three_month_days_string_result = <<-"EOS"
+#{three_month_day_cells[0].join}
+#{three_month_day_cells[1].join}
+#{three_month_day_cells[2].join}
+#{three_month_day_cells[3].join}
+#{three_month_day_cells[4].join}
+#{three_month_day_cells[5].join}
+      EOS
+      return three_month_days_string_result
     end
   end
 
@@ -160,6 +119,7 @@ class GenerateCal
       #{THIS_M}月 #{THIS_Y}
 日 月 火 水 木 金 土
 #{this_month_days_string}
+
     EOS
   end
 
@@ -170,15 +130,14 @@ class GenerateCal
     premonth_day_cells = self.class.generate_days(year: preyear, month: premonth)
     thismonth_day_cells = self.class.generate_days
     postmonth_day_cells = self.class.generate_days(year: postyear, month: postmonth)
-    days = self.class.generate_3month_days_string(premonth_day_cells, thismonth_day_cells, postmonth_day_cells)
+    days = self.class.generate_three_month_days_string(premonth_day_cells, thismonth_day_cells, postmonth_day_cells)
 
     puts <<-"EOS"
-    #{premonth}月 #{postyear}              #{THIS_M}月 #{THIS_Y}              #{postmonth}月 #{postyear}
+      #{premonth}月 #{postyear}              #{THIS_M}月 #{THIS_Y}              #{postmonth}月 #{postyear}
 日 月 火 水 木 金 土  日 月 火 水 木 金 土  日 月 火 水 木 金 土
 #{days}
 
   EOS
-
   end
 
 end
