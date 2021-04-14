@@ -1,7 +1,7 @@
 require 'date'
 require 'color_echo'
 
-class GenerateCal
+class GenerateGregorioCal
   THIS_Y = Date.today.year
   THIS_M = Date.today.mon
   THIS_D = Date.today.day
@@ -21,6 +21,8 @@ class GenerateCal
       month_first_w.times {days_array.push("\s\s")}
       days_array << [*1..month_last_d]
       days_array.flatten!
+      layout_parts = make_layout_parts(@request[:julius])
+
 
       p "#{year}年#{month}月"
 
@@ -37,14 +39,13 @@ class GenerateCal
           optimized_days_array << "\s#{@day}\s"
         else
           if year == THIS_Y && month == THIS_M && @day == THIS_D
-            optimized_days_array << "\e\e[47m[30m#{@day}\e[0m\s"
+            optimized_days_array << "\e\e[47m\e[30m#{@day}\e[0m\s"
             next
           end
           optimized_days_array << "#{@day}\s"
         end
       end
-      p result = [month, year, optimized_days_array]
-      return result
+      result = [month, year, optimized_days_array]
     end
 
     def premonth_calc(basic_month, basic_year, pre_num)
@@ -308,42 +309,43 @@ class GenerateCal
   def generate
     puts "カレンダーを生成します"
     result = ""
-    all_request_date = []
+    all_request_month = make_request_month
+    all_date_array = all_request_month.map do |date|
+      self.class.generate_days(date[1], date[0], THIS_D)
+    end
+    all_date_array_for_resource = all_date_array
+    puts "要求された月は#{all_date_array.size}つです"
+    result = rendering_calender(all_date_array)
+  end
+
+  def make_request_month
     premonth_request = self.class.premonth_calc(@request[:basic_month], @request[:basic_year], @request[:pre_month])
     nextmonth_request = self.class.nextmonth_calc(@request[:basic_month], @request[:basic_year], @request[:next_month])
 
     if premonth_request != nil
-      all_request_date += premonth_request
+      all_request_month_result += premonth_request
     end
-    all_request_date += [[@request[:basic_month], @request[:basic_year]]]
+    all_request_month_result += [[@request[:basic_month], @request[:basic_year]]]
     if nextmonth_request != nil
-      all_request_date += nextmonth_request
+      all_request_month_result += nextmonth_request
     end
-    p "-----------------"
-    p all_request_date
-    all_date_array = all_request_date.map do |date|
-      self.class.generate_days(date[1], date[0], THIS_D)
-    end
+    return all_request_month_result
+  end
 
-    all_date_array_for_resource = all_date_array
-    puts "要求された月は#{all_date_array.size}つです"
-
+  def rendering_calender(all_date_array_for_resource) #ここjurius対応
     while all_date_array_for_resource.size / 3 >= 1 do
-       result += self.class.generate_three_months_g_cal(all_date_array_for_resource[0], all_date_array_for_resource[1], all_date_array_for_resource[2])
-      all_date_array_for_resource.slice!(0, 3)
+      rendering_string_result += self.class.generate_three_months_g_cal(all_date_array_for_resource[0], all_date_array_for_resource[1], all_date_array_for_resource[2])
+     all_date_array_for_resource.slice!(0, 3)
     end
-
     if all_date_array_for_resource.size == 2
-      result += self.class.generate_two_months_g_cal(all_date_array_for_resource[0], all_date_array_for_resource[1])
+      rendering_string_result += self.class.generate_two_months_g_cal(all_date_array_for_resource[0], all_date_array_for_resource[1])
       all_date_array_for_resource.slice!(0, 2)
     end
-
     if all_date_array_for_resource.size == 1
-      result += self.class.generate_one_month_g_cal(all_date_array_for_resource[0])
+      rendering_string_result += self.class.generate_one_month_g_cal(all_date_array_for_resource[0])
       all_date_array_for_resource.slice!(0, 1)
     end
-    return result
-
   end
-  
+
+
 end

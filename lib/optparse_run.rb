@@ -63,7 +63,7 @@ class OptparseRun
 
       # このエラーはなくてもいい？
       if some_opt_after_this_opt(ARGV, "-m") == true
-        puts "-mオプションの直後には年を入力してください"
+        puts "-mオプションの直後には月を入力してください"
         exit
       end
 
