@@ -1,12 +1,16 @@
 require './make_request.rb'
-require './generate_julius_cal.rb'
-require './generate_gregorio_cal.rb'
+require './monthly_calender.rb'
+require './merge_cal.rb'
 
 class RubyCalFactory
-
   def make_result
     this_request = make_request
-    result = generate_cal(this_request)
+    result = get_cal(this_request)
+  end
+
+  def get_cal(this_request)
+    this_calender = MonthlyCalender.new(this_request)
+    this_calender.get_cal
   end
 
   def make_request
@@ -26,5 +30,4 @@ class RubyCalFactory
   def result
     return make_result
   end
-
 end
