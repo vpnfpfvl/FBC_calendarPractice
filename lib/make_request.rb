@@ -21,6 +21,7 @@ class MakeRequest
       next_year: nil,
       julius: false,
       highligth: true,
+      year_position: "default"
     }
   end
 

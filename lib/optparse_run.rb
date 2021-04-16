@@ -43,7 +43,7 @@ class OptparseRun
         
       end
 
-      if (ARGV[1] != nil) then
+      if (opt_has_one_number(ARGV, @index) == true && num_is_between_1_and_12(ARGV, @index) == true) then
         @keys_result[:next_month] = 11
         @keys_result[:basic_month] = 1
         @keys_result[:basic_year] = v.to_i
@@ -52,6 +52,7 @@ class OptparseRun
         @keys_result[:basic_month] = 1
         @keys_result[:basic_year] = THIS_Y
       end
+      @keys_result[:year_position] = "header"
       puts "\n"
       puts "-y オプションが実行されました"
       puts "現在のリクエストアレイは#{@keys_result}です"
