@@ -1,4 +1,4 @@
-require './optparse_run.rb' # いらなくなる
+require './optparse_run.rb'
 require './argument_vector.rb'
 require 'date'
 
@@ -9,7 +9,6 @@ class MakeRequest
   THIS_W = Date.today.wday
 
   def initialize
-    @argument_vector = ArgumentVector.new
     @generate_request_result = {}
     @default_request_status = {
       basic_month: THIS_M,
@@ -26,13 +25,14 @@ class MakeRequest
   end
 
   def make_this_request
+    @argument_vector = ArgumentVector.new
     this_request = generate_request
-    return this_request
   end
 
+  private
   def generate_request
-    @request_keys = @default_request_status
-    @generate_request_result = @argument_vector.get_request_status(@request_keys)
+    request_keys = @default_request_status
+    @generate_request_result = @argument_vector.get_request_status(request_keys)
   end
 
   def get_status(key)
