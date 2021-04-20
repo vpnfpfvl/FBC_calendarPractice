@@ -13,65 +13,48 @@ class MonthlyCalender
   end
 
   def get_cal
-    puts "カレンダーを生成します"
     result = ""
-
+    all_request_about_month = make_request_about_month
     layout_status = make_layout_status
-    
-    all_request_month = make_request_month
-    all_date_array = all_request_month.map do |date|
+    all_date_array = all_request_about_month.map do |date|
       this_date = CalenderDateUnit.new(date[1], date[0], THIS_D, @request)
       this_date.generate_days
     end
-    # all_date_array_for_resource
-    puts "要求された月は#{all_date_array.size}つです"
-    
     result = merge_cal(all_date_array, layout_status)
   end
 
-  def merge_cal(all_date_array, layout_status)
-    this_calender = MergeCalender.new(all_date_array, layout_status)
-    this_calender.merge
-  end
-
-  def make_request_month
-    all_request_month_result = []
-    
+  private
+  def make_request_about_month
+    all_request_about_month_result = []
     premonth_request = premonth_calc(@request[:basic_month], @request[:basic_year], @request[:pre_month])
     nextmonth_request = nextmonth_calc(@request[:basic_month], @request[:basic_year], @request[:next_month])
 
     if premonth_request != nil
-      all_request_month_result += premonth_request
+      all_request_about_month_result += premonth_request
     end
-    all_request_month_result += [[@request[:basic_month], @request[:basic_year]]]
+    all_request_about_month_result += [[@request[:basic_month], @request[:basic_year]]]
     if nextmonth_request != nil
-      all_request_month_result += nextmonth_request
+      all_request_about_month_result += nextmonth_request
     end
-    return all_request_month_result
+    all_request_about_month_result
   end
 
   def premonth_calc(basic_month, basic_year, pre_num)
-    if pre_num == nil then
-      p "premonthは要求されていません"
+    if pre_num.nil?
       return
     end
-    p "premonthcalc実行"
+
     pre_month = nil
     pre_year = nil
     premonth_request_result = []
-
-    if basic_month - pre_num > 0
-      p pre_month = basic_month - pre_num
-      p pre_year = basic_year
-    elsif basic_month - pre_num <= 0
-      p pre_month = 12 - ((basic_month - pre_num).abs % 12)
-      p pre_year =  basic_year - ((basic_month - pre_num).abs / 12) - 1
-    else
-
+    case
+    when basic_month - pre_num > 0
+      count_pre_month = basic_month - pre_num
+      count_pre_year = basic_year
+    when basic_month - pre_num <= 0
+      count_pre_month = 12 - ((basic_month - pre_num).abs % 12)
+      count_pre_year =  basic_year - ((basic_month - pre_num).abs / 12) - 1
     end
-
-    count_pre_month = pre_month
-    count_pre_year = pre_year
 
     while count_pre_year < basic_year do
       while count_pre_month <= 12 do
@@ -85,33 +68,27 @@ class MonthlyCalender
       premonth_request_result << [count_pre_month, count_pre_year]
       count_pre_month += 1
     end
-    p premonth_request_result
-    return premonth_request_result 
+    premonth_request_result 
   end
 
   def nextmonth_calc(basic_month, basic_year, next_num)
-    if next_num == nil then
-      p "nextmonthは要求されていません"
+    if next_num.nil?
       return
     end
-    p "nextmonthcalc実行"
     next_month = nil
     next_year = nil
     nextmonth_request_result = []
-
-    if basic_month + next_num <= 12
-      p next_month = basic_month + next_num
-      p next_year = basic_year
-    elsif basic_month + next_num > 12
-      p next_month = (basic_month + next_num) % 12
-      p next_year =  basic_year + (basic_month + next_num) / 12
-    else
-
+    case
+    when basic_month + next_num <= 12
+      next_month = basic_month + next_num
+      next_year = basic_year
+    when basic_month + next_num > 12
+      next_month = (basic_month + next_num) % 12
+      next_year =  basic_year + (basic_month + next_num) / 12
     end
 
     count_next_month = basic_month + 1
     count_next_year = basic_year
-
     while  count_next_year < next_year do
       while count_next_month <= 12 do
         nextmonth_request_result << [count_next_month, count_next_year]
@@ -124,8 +101,7 @@ class MonthlyCalender
       nextmonth_request_result << [count_next_month, count_next_year]
       count_next_month += 1
     end
-    p nextmonth_request_result
-    return nextmonth_request_result 
+    nextmonth_request_result 
   end
 
   def make_layout_status
@@ -152,7 +128,6 @@ class MonthlyCalender
       layout_status_result[:blank] = "\s\s"
       layout_status_result[:blank_for_one_char] = "\s"
       layout_status_result[:blank_for_two_char] = ""
-      # layout_status_result[:blank_for_three_char] = ""
       layout_status_result[:month_row_num] = 3
       layout_status_result[:one_week] =  "日 月 火 水 木 金 土"
       layout_status_result[:two_weeks] =  "日 月 火 水 木 金 土  日 月 火 水 木 金 土"
@@ -179,7 +154,6 @@ class MonthlyCalender
         layout_status_result[:one_caption] = one_caption
         layout_status_result[:two_caption] = two_caption
         layout_status_result[:header_position] = header_position
-
       when false
         one_caption = Proc.new{ |first_month, first_year| "       #{first_month}月"}
         two_caption = Proc.new{ |first_month, first_year, second_month, second_year| "       #{first_month}月              #{second_month}月" }
@@ -198,10 +172,12 @@ class MonthlyCalender
     when false
       layout_status_result[:highligth] = false
     end
+    layout_status_result
+  end
 
-    return layout_status_result
-
-
+  def merge_cal(all_date_array, layout_status)
+    this_calender = MergeCalender.new(all_date_array, layout_status)
+    this_calender.merge
   end
 end
 

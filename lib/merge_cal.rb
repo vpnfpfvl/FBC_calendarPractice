@@ -11,10 +11,43 @@ class MergeCalender
 
   def merge
     rendering_calender(@all_date_array)
-  end 
+  end
+
+  private
+  def rendering_calender(all_date_array)
+    rendering_string_result = ""
+    replaced_all_date_array = Marshal.load(Marshal.dump(all_date_array))
+    replaced_all_date_array = replace_layout_var(replaced_all_date_array)
+    case @layout_status[:month_row_num]
+    when 3
+      while replaced_all_date_array.size / 3 >= 1 do
+        rendering_string_result += merge_date_unit(3, replaced_all_date_array[0], replaced_all_date_array[1], replaced_all_date_array[2])
+      replaced_all_date_array.slice!(0, 3)
+      end
+      if replaced_all_date_array.size == 2
+        rendering_string_result += merge_date_unit(2, replaced_all_date_array[0], replaced_all_date_array[1])
+        replaced_all_date_array.slice!(0, 2)
+      end
+      if replaced_all_date_array.size == 1
+        rendering_string_result += merge_date_unit(1, replaced_all_date_array[0])
+        replaced_all_date_array.slice!(0, 1)
+      end    
+    when 2 
+      while replaced_all_date_array.size / 2 >= 1 do
+        rendering_string_result += merge_date_unit(2, replaced_all_date_array[0], replaced_all_date_array[1])
+      replaced_all_date_array.slice!(0, 2)
+      end
+      if replaced_all_date_array.size == 1
+        rendering_string_result += merge_date_unit(1, replaced_all_date_array[0])
+        replaced_all_date_array.slice!(0, 1)
+      end
+    end
+
+    rendering_string_result.insert(0, @layout_status[:header_position].call(@all_date_array[0][1]))
+    rendering_string_result
+  end
 
   def merge_date_unit(merge_unit_num, first_unit = nil, second_unit = nil, third_unit = nil)
-
     case merge_unit_num
     when 1
       first_unit_day_cells = first_unit[2]
@@ -146,8 +179,6 @@ class MergeCalender
     return join_days_string_result
   end
 
-
-
   def replace_layout_var(all_date_array)
     all_date_array.each_with_index do |month, month_index|
       month[2].each_with_index do |element, day|
@@ -167,40 +198,4 @@ class MergeCalender
     end
   end
 
-
-  def rendering_calender(all_date_array)
-    rendering_string_result = ""
-    replaced_all_date_array = Marshal.load(Marshal.dump(all_date_array))
-    replaced_all_date_array = replace_layout_var(replaced_all_date_array)
-    case @layout_status[:month_row_num]
-    when 3
-      while replaced_all_date_array.size / 3 >= 1 do
-        rendering_string_result += merge_date_unit(3, replaced_all_date_array[0], replaced_all_date_array[1], replaced_all_date_array[2])
-      replaced_all_date_array.slice!(0, 3)
-      end
-    
-      if replaced_all_date_array.size == 2
-        rendering_string_result += merge_date_unit(2, replaced_all_date_array[0], replaced_all_date_array[1])
-        replaced_all_date_array.slice!(0, 2)
-      end
-      if replaced_all_date_array.size == 1
-        rendering_string_result += merge_date_unit(1, replaced_all_date_array[0])
-        replaced_all_date_array.slice!(0, 1)
-      end    
-    when 2 
-      while replaced_all_date_array.size / 2 >= 1 do
-        rendering_string_result += merge_date_unit(2, replaced_all_date_array[0], replaced_all_date_array[1])
-      replaced_all_date_array.slice!(0, 2)
-      end
-      if replaced_all_date_array.size == 1
-        rendering_string_result += merge_date_unit(1, replaced_all_date_array[0])
-        replaced_all_date_array.slice!(0, 1)
-      end
-    end
-
-    p "ここ"
-    rendering_string_result.insert(0, @layout_status[:header_position].call(@all_date_array[0][1]))
-    rendering_string_result
-  end
 end
-
