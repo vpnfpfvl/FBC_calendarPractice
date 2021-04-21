@@ -1,8 +1,8 @@
 require './rubycal_factory.rb'
 
 def do_rubycal
-  this_order = RubyCalFactory.new
-  puts this_order.result
+  order = RubyCalFactory.new
+  puts order.get_result
 end
 
 do_rubycal

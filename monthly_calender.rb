@@ -17,10 +17,10 @@ class MonthlyCalender
     all_request_about_month = make_request_about_month
     layout_status = make_layout_status
     all_date_array = all_request_about_month.map do |date|
-      this_date = CalenderDateUnit.new(date[1], date[0], THIS_D, @request)
+      this_date = CalenderDateUnit.new(date[0], date[1], @request)
       this_date.generate_days
     end
-    result = merge_cal(all_date_array, layout_status)
+    merge_result = merge_cal(all_date_array, layout_status)
   end
 
   private

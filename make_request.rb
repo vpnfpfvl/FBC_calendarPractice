@@ -1,5 +1,4 @@
 require './optparse_run.rb'
-require './argument_vector.rb'
 require 'date'
 
 class MakeRequest
@@ -15,29 +14,15 @@ class MakeRequest
       basic_year: THIS_Y,
       basic_day: THIS_D,
       pre_month: nil,
-      pre_year: nil,
       next_month: nil,
-      next_year: nil,
       julius: false,
       highligth: true,
       year_position: "default"
     }
   end
 
-  def make_this_request
-    @argument_vector = ArgumentVector.new
-    this_request = generate_request
+  def make_request
+    parse_arge = OptparseRun.new(@default_request_status)
+    request_result = parse_arge.optparse_run
   end
-
-  private
-  def generate_request
-    request_keys = @default_request_status
-    @generate_request_result = @argument_vector.get_request_status(request_keys)
-  end
-
-  def get_status(key)
-    k = key.to_s
-    @argument_vector.choose_get(k)
-  end
-
 end
