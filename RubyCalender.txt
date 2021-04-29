@@ -1,0 +1,55 @@
+title Ruby Calendar
+participantgroup 
+  participant rubycal.rb
+  participant RubyCalFactory
+  participantgroup #pink オプションを解析してリクエストを作る
+    participant MakeRequest
+    participant OptparseRun
+  end
+  participantgroup #lightblue リクエストを元にカレンダーを作る
+    participant MonthlyCalendar
+    participant CalendarDateUnit
+    participant MergeCalendar
+  end
+end
+
+
+activate rubycal.rb
+note over RubyCalFactory:カレンダーを作るクラス
+rubycal.rb->RubyCalFactory:run
+activate RubyCalFactory
+note over MakeRequest:リクエストの項目を決めて、\noptparse_runに解析を要求する
+RubyCalFactory->MakeRequest:make_request
+activate MakeRequest
+note over OptparseRun:オプションを解析する\n\nOptparseConditionsモジュールは\n条件分岐のメソッドをまとめたもの
+MakeRequest->OptparseRun:optparse_run(@default_request_status)
+activate OptparseRun
+OptparseRun->MakeRequest:(result)
+deactivate OptparseRun
+MakeRequest->RubyCalFactory:request
+deactivate MakeRequest
+
+note over MonthlyCalendar:リクエストから必要な年月とレイアウトに\n必要な数字を計算してカレンダーを生成する
+RubyCalFactory->MonthlyCalendar:make_cal(request)
+activate MonthlyCalendar
+MonthlyCalendar->MonthlyCalendar:make_request_about_month\n具体的に必要な年月を計算する
+MonthlyCalendar->MonthlyCalendar:make_layout_status\nレイアウトに必要なcolumn数、余白の大きさなどを決める\n-j、-yオプションが深く関わっている
+
+
+loop
+  MonthlyCalendar->CalendarDateUnit:generate_days(date[0], date[1], @request)\n一月づつ日付を生成する\ndate[0]は月、date[1]は年
+  activate CalendarDateUnit
+  CalendarDateUnit->MonthlyCalendar:this_date
+  deactivate CalendarDateUnit
+end
+
+note over MergeCalendar:layout_statusに従って\nall_date_arrayを結合しカレンダーを作る
+MonthlyCalendar->MergeCalendar:merge_cal(all_dates, layout_status)
+activate MergeCalendar
+MergeCalendar->MonthlyCalendar:(result)
+deactivate MergeCalendar
+MonthlyCalendar->RubyCalFactory:(result)
+deactivate MonthlyCalendar
+RubyCalFactory->rubycal.rb:(result)
+deactivate RubyCalFactory
+  

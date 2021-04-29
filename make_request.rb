@@ -1,4 +1,6 @@
-require './optparse_run.rb'
+# frozen_string_literal: true
+
+require './optparse_run'
 require 'date'
 
 class MakeRequest
@@ -17,12 +19,12 @@ class MakeRequest
       next_month: nil,
       julius: false,
       highligth: true,
-      year_position: "default"
+      year_position: 'default'
     }
   end
 
   def make_request
     parse_arge = OptparseRun.new(@default_request_status)
-    request_result = parse_arge.optparse_run
+    parse_arge.optparse_run
   end
 end

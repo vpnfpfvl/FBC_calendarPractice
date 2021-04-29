@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OptparseConditions
   def opt_has_two_numbers?(argv, opt_index_num)
     (/^\d+$/ === argv[opt_index_num + 1].to_s && /^\d+$/ === argv[opt_index_num.to_i + 2].to_s)
@@ -27,5 +29,4 @@ module OptparseConditions
     conflicting_opt = argv & conflicting_opt_list
     !conflicting_opt.empty?
   end
-  
 end
