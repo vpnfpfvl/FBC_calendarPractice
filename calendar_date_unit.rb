@@ -47,12 +47,8 @@ class CalendarDateUnit
     Date.new(@year, @month, 1).wday
   end
 
-  def add_blank(days_array)
-    
-  end
 
   def add_blank(days_array)
-    result = []
     month_first_w.times { days_array.unshift('blank') }
     days_array.each do |day|
       if day.to_s.include?('blank')

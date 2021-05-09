@@ -3,7 +3,73 @@
 require 'date'
 
 
-class MergeCalendar
+class MergeCalendar(request)
+  def initialize
+    @request = request
+  end
+
+  def merge
+    <<~CALENDAR
+      #{title}
+      #{week}
+      #{days}
+    CALENDAR
+  end
+
+  def title
+    return "#{@request[:year]}年#{@request[:month]}月"
+  end
+
+  def week
+    hm = @layout[:head_mergin]
+    wm = @layout[:week_mergin]
+    em = @layout[:end_mergin]
+    return "#{hm}日#{wm}月#{wm}火#{wm}水#{wm}木#{wm}金#{wm}土#{em}"
+  end
+
+  def days
+    assemble_date(calc_days)
+  end
+
+  def calc_days
+    (1..month_last_d).to_a.flatten
+  end
+
+  def month_last_d
+    Date.new(@year, @month, -1).day
+  end
+
+  def assemble_date
+
+  end
+
+  #   make_dayscal(row_num)
+  #   case row
+  #   when 6
+  #     <<~CALENDAR
+  #       #{days[:low1]}
+  #       #{days[:low2]}
+  #       #{days[:low3]}
+  #       #{days[:low4]}
+  #       #{days[:low5]}
+  #       #{days[:low6]}
+  #     CALENDAR
+  #   when 5
+  #     <<~CALENDAR
+  #     #{days[:low1]}
+  #     #{days[:low2]}
+  #     #{days[:low3]}
+  #     #{days[:low4]}
+  #     #{days[:low5]}
+  #     CALENDAR
+  # end
+end
+
+
+
+
+
+
   THIS_Y = Date.today.year
   THIS_M = Date.today.mon
   THIS_D = Date.today.day
